@@ -1,0 +1,9 @@
+
+# puppet will install this file as the .screenrc for user 'vagrant' in
+# the vagrant-managed VM.
+
+escape ^pa
+startup_message off
+caption always
+vbell off
+defscrollback 5000

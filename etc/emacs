@@ -1,0 +1,2 @@
+(setq-default show-trailing-whitespace t)
+(setq-default indent-tabs-mode nil)

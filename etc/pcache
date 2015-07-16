@@ -1,0 +1,199 @@
+#!/usr/bin/env python
+
+import os
+import sys
+import re
+import pty
+import getpass
+import asyncore
+import tempfile
+import base64
+import errno
+
+USERNAME_PATTERNS = (r'^Username:',
+                     r'^Username for .*:',
+                     )
+
+PASSWORD_PATTERNS = (r'^Password:',
+                     r"'s password:",
+                     r'^Password for .*:',
+                     )
+
+LINE_REGEX = re.compile('^[^\n]*\n\r?')
+
+PAD_TO_LENGTH = 60
+
+USER_PASS_PATTERNS = []
+for pat in USERNAME_PATTERNS:
+    USER_PASS_PATTERNS.append(('username', re.compile(pat, re.MULTILINE)))
+for pat in PASSWORD_PATTERNS:
+    USER_PASS_PATTERNS.append(('password', re.compile(pat, re.MULTILINE)))
+
+class UserPassDispatcher(asyncore.file_dispatcher):
+    def __init__(self, fd, callback):
+        asyncore.file_dispatcher.__init__(self, fd)
+        self.buffer = ''
+        self.callback = callback
+
+    def writable(self):
+        return False
+
+    def handle_read(self):
+        try:
+            newText = self.recv(2048)
+        except OSError, oe:
+            # EIO on ptty read indicates EOF under Linux
+            # see http://bugs.python.org/issue5380
+            if oe.errno != errno.EIO:
+                raise
+            self.close()
+            return
+
+        sys.stdout.write(newText)
+        sys.stdout.flush()
+
+        self.buffer += newText
+        while 1:
+            oldBuffer = self.buffer
+            for patType, regex in USER_PASS_PATTERNS:
+                match = regex.search(self.buffer)
+                if match:
+                    self.buffer = self.buffer[match.end():]
+                    self.callback(patType)
+                    break
+            self.buffer = LINE_REGEX.sub('', self.buffer)
+            if self.buffer == oldBuffer:
+                break
+
+    def handle_expt(self):
+        # ignore out of band data
+        pass
+
+    def handle_close(self):
+        self.close()
+
+
+def xorString(s, t):
+    return ''.join([chr(ord(a) ^ ord(b)) for a, b in zip(s, t)])
+
+
+def storeInfo(info):
+    assert len(info) < PAD_TO_LENGTH, 'String to store should have at most %d characters' % PAD_TO_LENGTH
+    padded = info + '\0' * (PAD_TO_LENGTH - len(info))
+    oneTimePad = open('/dev/urandom', 'r').read(len(padded))
+    fd, tmpPath = tempfile.mkstemp('-pcache.dat')
+    tmpOut = os.fdopen(fd, 'w')
+    tmpOut.write(oneTimePad)
+    tmpOut.close()
+    encrypted = xorString(padded, oneTimePad)
+    envData = base64.b64encode(encrypted)
+    key = '%s;%s' % (envData, tmpPath)
+    return key
+
+
+def retrieveInfo(key):
+    envData, tmpPath = key.split(';', 1)
+    oneTimePad = open(tmpPath, 'r').read()
+    encrypted = base64.b64decode(envData)
+    padded = xorString(encrypted, oneTimePad)
+    info = re.sub(r'\0+$', '', padded)
+    return info
+
+
+class PasswordCache(object):
+    def stdoutCallback(self, patType):
+        if patType == 'username':
+            self.stdin.write(self.username + '\n')
+        elif patType == 'password':
+            self.stdin.write(self.password + '\n')
+        else:
+            assert False, 'unknown patType'
+        self.stdin.flush()
+
+    def askCredentials(self):
+        defaultUsername = getpass.getuser()
+        uprompt = 'Username [%s]: ' % defaultUsername
+        self.username = getpass.getpass(uprompt).strip() or defaultUsername
+        self.password = getpass.getpass()
+
+    def getCredentials(self):
+        if 'PCACHE_INFO' in os.environ:
+            info = retrieveInfo(os.environ['PCACHE_INFO'])
+            self.username, self.password = info.split(':', 1)
+        else:
+            self.askCredentials()
+
+    def addCredentials(self):
+        self.askCredentials()
+        key = storeInfo(':'.join((self.username, self.password)))
+        print 'export PCACHE_INFO="%s"' % key
+
+    def deleteCredentials(self):
+        if 'PCACHE_INFO' in os.environ:
+            _envData, tmpPath = os.environ['PCACHE_INFO'].split(';')
+            try:
+                os.unlink(tmpPath)
+            except:
+                print >> sys.stderr, 'warning: could not delete one time pad file'
+            print 'unset PCACHE_INFO'
+        else:
+            print >> sys.stderr, 'pcache: no credentials to delete'
+
+    def runCmd(self, args):
+        self.getCredentials()
+
+        # run command, using credentials
+        print ' '.join(args)
+        pid, fd = pty.fork()
+        if pid == 0:
+            os.execlp(args[0], *args)
+        self.stdin = os.fdopen(fd, 'w')
+        _dispatcher = UserPassDispatcher(fd, self.stdoutCallback)
+        asyncore.loop(timeout=9999)
+
+
+def usage(msg=''):
+    if msg:
+        print >> sys.stderr, 'ERROR: %s\n' % msg
+    print >> sys.stderr, ("""
+usage: %s [cmd] [arg1] [arg2] ...
+  -d or --delete    Delete credentials
+
+Examples:
+  eval `pcache`      Adds credentials to environment
+  pcache cmd args ...  Runs command using stored credentials
+  eval `pcache -d`   Deletes credentials from environment
+  unset PCACHE_INFO    Also deletes credentials, not quite as thorough
+"""
+                          % sys.argv[0])
+    sys.exit(1)
+
+
+def main():
+    args = []
+    delete = False
+    pastOpts = False
+    for arg in sys.argv[1:]:
+        if not pastOpts and arg.startswith('-'):
+            if arg in ('-h', '--help'):
+                usage()
+            elif arg in ('-d', '--delete'):
+                delete = True
+            else:
+                usage('unknown option %s' % arg)
+        else:
+            pastOpts = True
+            args.append(arg)
+    cache = PasswordCache()
+    if args:
+        if delete:
+            usage('expected no args with -d option')
+        cache.runCmd(args)
+    else:
+        if delete:
+            cache.deleteCredentials()
+        else:
+            cache.addCredentials()
+
+if __name__ == '__main__':
+    main()
