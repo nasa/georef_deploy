@@ -394,31 +394,31 @@ class site_setup {
   class { 'dbcreate': }
   contain 'dbcreate'
 
-  exec { 'dbfetch':
-    command => "/usr/bin/curl -o /home/$user/puppet/xgds_${site}_dump.sql.gz http://xgds.org/vagrant/xgds_${site}_dump.sql.gz",
-    creates => "/home/$user/puppet/xgds_${site}_dump.sql.gz",
-    user => $user,
-  }
+#  exec { 'dbfetch':
+#    command => "/usr/bin/curl -o /home/$user/puppet/xgds_${site}_dump.sql.gz http://xgds.org/vagrant/xgds_${site}_dump.sql.gz",
+#    creates => "/home/$user/puppet/xgds_${site}_dump.sql.gz",
+#    user => $user,
+#  }
 
-  exec { 'dbrestore':
-    command => "/bin/gunzip -c /home/$user/puppet/xgds_${site}_dump.sql.gz | ${sitedir}/manage.py dbshell",
-    creates => "/var/lib/mysql/xgds_${site}/auth_user.frm",
-    require => [Class['dbcreate'], Exec['extraSettings'], Exec['dbfetch']],
-    user => $user,
-  }
+#  exec { 'dbrestore':
+#    command => "/bin/gunzip -c /home/$user/puppet/xgds_${site}_dump.sql.gz | ${sitedir}/manage.py dbshell",
+#    creates => "/var/lib/mysql/xgds_${site}/auth_user.frm",
+#    require => [Class['dbcreate'], Exec['extraSettings'], Exec['dbfetch']],
+#    user => $user,
+#  }
 
-  exec { 'datafetch':
-    command => "/usr/bin/curl -o /home/$user/puppet/xgds_${site}_data_dir.tgz http://xgds.org/vagrant/xgds_${site}_data_dir.tgz",
-    creates => "/home/$user/puppet/xgds_${site}_data_dir.tgz",
-    user => $user,
-  }
+#  exec { 'datafetch':
+#    command => "/usr/bin/curl -o /home/$user/puppet/xgds_${site}_data_dir.tgz http://xgds.org/vagrant/xgds_${site}_data_dir.tgz",
+#    creates => "/home/$user/puppet/xgds_${site}_data_dir.tgz",
+#    user => $user,
+#  }
 
-  exec { 'data_dir_unpack':
-    command => "/bin/tar xfz /home/$user/puppet/xgds_${site}_data_dir.tgz && chmod -R a+rX xgds_${site}_data && chmod -R g+w xgds_${site}_data && find xgds_${site}_data -type d | xargs chmod g+s && sudo chown -R www-data:www-data xgds_${site}_data && mv xgds_${site}_data xgds_${site}/data",
-    cwd => "/home/$user/gds/",
-    creates => "${sitedir}/data",
-    require => Exec['datafetch'],
-  }
+#  exec { 'data_dir_unpack':
+#    command => "/bin/tar xfz /home/$user/puppet/xgds_${site}_data_dir.tgz && chmod -R a+rX xgds_${site}_data && chmod -R g+w xgds_${site}_data && find xgds_${site}_data -type d | xargs chmod g+s && sudo chown -R www-data:www-data xgds_${site}_data && mv xgds_${site}_data xgds_${site}/data",
+#    cwd => "/home/$user/gds/",
+#    creates => "${sitedir}/data",
+#    require => Exec['datafetch'],
+#  }
 
   user { $user:
     ensure => present,
