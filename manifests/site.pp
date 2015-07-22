@@ -371,7 +371,7 @@ class site_setup {
 
   # run 'manage.py bootstrap' to generate sourceme.sh and settings.py
   exec { 'bootstrap':
-    command => "${sitedir}/manage.py bootstrap --puppet --yes genSourceme genSettings",
+    command => "${sitedir}/management/bootstrap.py --puppet --yes genSourceme genSettings",
     creates => "${sitedir}/settings.py",
     user => $user,
   }
