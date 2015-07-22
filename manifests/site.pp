@@ -372,8 +372,8 @@ class site_setup {
   # run 'manage.py bootstrap' to generate sourceme.sh and settings.py
   exec { 'bootstrap':
 #    command => "${sitedir}/management/bootstrap.py --yes",
-    command => "${sitedir}/manage.py bootstrap --yes",
-    creates => "${sitedir}/sourceme.sh",
+    command => "${sitedir}/manage.py bootstrap --yes genSourceme genSettings",
+    creates => "${sitedir}/settings.py",
     user => $user,
   }
   # append vagrant-specific settings to base settings.py
