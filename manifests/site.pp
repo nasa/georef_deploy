@@ -375,6 +375,7 @@ class site_setup {
     creates => "${sitedir}/settings.py",
     user => $user,
   }
+  
   # append vagrant-specific settings to base settings.py
   exec { 'extraSettings':
     command => "/bin/cat ${deploy}/etc/extraSettings.py >> ${sitedir}/settings.py && touch ${sitedir}/build/management/extraSettings.txt",
@@ -433,11 +434,13 @@ class site_setup {
 #    require => Exec['dbrestore'],
 #    user => $user,
 #  }
+
   exec { 'prep':
     # can't run this with root environment variables, because bower
     # crashes if it looks for files in root's home directory. setting the puppet
     # 'user' flag as shown below isn't sufficient. 'su' seems to be needed.
-    command => "/bin/su -l $user -c '${sitedir}/manage.py prep'",
+    command => " /bin/su -l $user -c 'source ${sitedir}/sourceme.sh; ${sitedir}/manage.py prep'",
+    # notify =>{/bin/su -l $user -c 'echo $DJANGO_SETTINGS_MODULE'},
     # user => $user,
     require => Exec['bootstrap'],
   }
