@@ -439,7 +439,7 @@ class site_setup {
     # can't run this with root environment variables, because bower
     # crashes if it looks for files in root's home directory. setting the puppet
     # 'user' flag as shown below isn't sufficient. 'su' seems to be needed.
-    command => " /bin/su -l $user -c 'source ${sitedir}/sourceme.sh; ${sitedir}/manage.py prep'",
+    command => "/bin/su -l $user -c 'source ${sitedir}/sourceme.sh; ${sitedir}/manage.py prep'",
     # notify =>{/bin/su -l $user -c 'echo $DJANGO_SETTINGS_MODULE'},
     # user => $user,
     require => Exec['bootstrap'],
