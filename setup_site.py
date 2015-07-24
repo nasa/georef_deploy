@@ -18,6 +18,7 @@ HOME_DIR = os.path.expanduser('~') + '/'
 GDS_DIR = HOME_DIR + 'gds/'
 USER = os.getenv('USER')
 PUPPET_DIR = HOME_DIR + 'puppet/'
+VAGRANT_DIR = '/vagrant'
 
 
 def dosys(cmd, exitOnError=True):
@@ -96,11 +97,28 @@ def symlinkDeployRepo(repo):
         dosys('ln -s %s %s' % (thisDir, repoDir))
 
 
-def checkoutSourceRepo(repo):
-    dosys('sudo apt-get install -y git-core')
-    repoDir = GDS_DIR + repo
-    if not os.path.exists(GDS_DIR):
-        dosys('mkdir -p %s' % GDS_DIR)
+def linkExistingSource(repo):
+    """ If the user checked out the source code on the host machine, it will be in /vagrant.
+    Link it to GDS_DIR
+    """
+    fullPath = os.path.join(VAGRANT_DIR, repo)
+    if os.path.exists(fullPath):
+        if not os.path.exists(GDS_DIR):
+            dosys('mkdir -p %s' % GDS_DIR)
+        dosys('ln -s %s %s' % (fullPath, GDS_DIR))
+        return True
+    return False
+
+
+def checkoutSourceRepo(repo, inVagrant=True):
+    if inVagrant:
+        dosys('sudo apt-get install -y git-core')
+        repoDir = GDS_DIR + repo
+        if not os.path.exists(GDS_DIR):
+            dosys('mkdir -p %s' % GDS_DIR)
+    else:
+        GDS_DIR = '.'
+        repoDir = repo
     if os.path.exists(repoDir):
         logging.info('%s exists, not changing existing config', repoDir)
     else:
@@ -152,7 +170,9 @@ def setup(opts):
     os.chdir(HOME_DIR)
     symlinkDeployRepo('xgds_' + SITE_NAME + '_deploy')
     installPuppet()
-    checkoutSourceRepo('xgds_' + SITE_NAME)
+    found = linkExistingSource('xgds_' + SITE_NAME)
+    if not found:
+        checkoutSourceRepo('xgds_' + SITE_NAME)
     setupPuppetFacts(opts)
     runPuppet(SITE_NAME)
 
