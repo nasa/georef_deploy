@@ -372,6 +372,7 @@ class site_setup {
   # run 'manage.py bootstrap' to generate sourceme.sh and settings.py
   exec { 'bootstrap':
     command => "${sitedir}/management/bootstrap.py --puppet --yes genSourceme genSettings",
+    onlyif => '/usr/bin/test ! -f ${sitedir}/settings.py',
     creates => "${sitedir}/settings.py",
     user => $user,
   }
@@ -428,20 +429,11 @@ class site_setup {
     groups => ['www-data'],
   }
 
-# collectmedia is no longer used. prep calls collectstatic instead.
-#  exec { 'collectmedia':
-#    command => "${sitedir}/manage.py collectmedia",
-#    require => Exec['dbrestore'],
-#    user => $user,
-#  }
-
   exec { 'prep':
     # can't run this with root environment variables, because bower
     # crashes if it looks for files in root's home directory. setting the puppet
     # 'user' flag as shown below isn't sufficient. 'su' seems to be needed.
-    command => "/bin/su -l $user -c 'source ${sitedir}/sourceme.sh; ${sitedir}/manage.py prep'",
-    # notify =>{/bin/su -l $user -c 'echo $DJANGO_SETTINGS_MODULE'},
-    # user => $user,
+    command => "/bin/su -l $user -c '(cd gds/xgds_basalt && ./manage.py prep)'",
     require => Exec['bootstrap'],
   }
 
