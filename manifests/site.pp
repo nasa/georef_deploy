@@ -5,7 +5,12 @@ include stdlib
 # $user, $site, $dev_instance set in /etc/facter/facts.d/xgds.json -- see setup_site.py
 
 $deploy = "/home/$user/puppet/xgds_${site}_deploy"
-$sitedir = "/home/$user/gds/xgds_${site}"
+if $dev_instance {
+  $sitedir = "/home/$user/gds/xgds_${site}"
+}
+else {
+  $sitedir = "/home/$user/xgds_${site}"
+}
 
 #################################################################
 # MARIA DB PACKAGE Source
@@ -437,10 +442,12 @@ class site_setup {
     require => Exec['bootstrap'],
   }
 
-  # symlink shortcut
-  file { "/home/$user/xgds_${site}":
-    ensure => link,
-    target => "gds/xgds_${site}",
+  # symlink shortcut for dev environment only
+  if $dev_instance {
+    file { "/home/$user/xgds_${site}":
+      ensure => link,
+      target => "gds/xgds_${site}",
+    }
   }
 
   # handy setup for dev work
