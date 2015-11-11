@@ -2,14 +2,14 @@
 include apt
 include stdlib
 
-# $user, $site, $dev_instance set in /etc/facter/facts.d/xgds.json -- see setup_site.py
+# $user, $site, $dev_instance set in /etc/facter/facts.d/georef.json -- see setup_site.py
 
-$deploy = "/home/$user/puppet/xgds_${site}_deploy"
+$deploy = "/home/$user/puppet/${site}_deploy"
 if $dev_instance {
-  $sitedir = "/home/$user/gds/xgds_${site}"
+  $sitedir = "/home/$user/gds/${site}"
 }
 else {
-  $sitedir = "/home/$user/xgds_${site}"
+  $sitedir = "/home/$user/${site}"
 }
 
 #################################################################
@@ -348,24 +348,24 @@ Class['ubuntu_packages'] -> Class['apache_setup']
 # SITE SETUP
 
 if $dev_instance {
-  $apacheConfSource = "${deploy}/etc/xgds_${site}_dev.conf"
+  $apacheConfSource = "${deploy}/etc/${site}_dev.conf"
 }
 else {
-  $apacheConfSource = "${deploy}/etc/xgds_${site}_prod.conf"
+  $apacheConfSource = "${deploy}/etc/${site}_prod.conf"
 }
 
 class site_setup {
   # make symlinks to the apache site config in the standard locations so
   # apache uses it.
   file { 'apache2_conf_available':
-    path => "/etc/apache2/sites-available/xgds_${site}.conf",
+    path => "/etc/apache2/sites-available/${site}.conf",
     ensure => file,
     content => file($apacheConfSource),
   }
   file { 'apache2_conf_enabled':
-    path => "/etc/apache2/sites-enabled/xgds_${site}.conf",
+    path => "/etc/apache2/sites-enabled/${site}.conf",
     ensure => link,
-    target => "../sites-available/xgds_${site}.conf",
+    target => "../sites-available/${site}.conf",
     require => File['apache2_conf_available'],
   }
   # pyraptord boot script
@@ -390,7 +390,7 @@ class site_setup {
   }
 
   class dbcreate {
-    mysql::db { "xgds_${site}":
+    mysql::db { "${site}":
       ensure => present,
       user => $user,
       password => 'vagrant',
@@ -438,15 +438,15 @@ class site_setup {
     # can't run this with root environment variables, because bower
     # crashes if it looks for files in root's home directory. setting the puppet
     # 'user' flag as shown below isn't sufficient. 'su' seems to be needed.
-    command => "/bin/su -l $user -c '(cd gds/xgds_basalt && ./manage.py prep)'",
+    command => "/bin/su -l $user -c '(cd gds/georef && ./manage.py prep)'",
     require => Exec['bootstrap'],
   }
 
   # symlink shortcut for dev environment only
   if $dev_instance {
-    file { "/home/$user/xgds_${site}":
+    file { "/home/$user/${site}":
       ensure => link,
-      target => "gds/xgds_${site}",
+      target => "gds/${site}",
     }
   }
 

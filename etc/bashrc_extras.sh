@@ -6,7 +6,7 @@
 # 'ls' is a pain to type in dvorak
 alias e=ls
 
-# set up environment for xgds_basalt development
-if [ -f $HOME/xgds_basalt/sourceme.sh ]; then
-  source $HOME/xgds_basalt/sourceme.sh
+# set up environment for georef development
+if [ -f $HOME/georef/sourceme.sh ]; then
+  source $HOME/georef/sourceme.sh
 fi

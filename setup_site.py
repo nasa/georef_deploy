@@ -12,7 +12,7 @@ import tempfile
 import json
 import subprocess
 
-SITE_NAME = 'basalt'
+SITE_NAME = 'georef'
 GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
 HOME_DIR = os.path.expanduser('~') + '/'
 GDS_DIR = HOME_DIR + 'gds/'
@@ -82,7 +82,7 @@ def installPuppet():
 
 def symlinkDeployRepo(repo):
     # if the /vagrant dir exists, we are in a vagrant guest, and
-    # /vagrant should point to a checkout of xgds_<site>_deploy on the
+    # /vagrant should point to a checkout of <site>_deploy on the
     # host file system. to avoid confusion, let's symlink to that single
     # copy of the deploy repo, which we can edit from either host or
     # guest, rather than checking out a second copy that can get out of
@@ -127,8 +127,8 @@ def checkoutSourceRepo(repo, inVagrant=True):
 
 
 def setupPuppetFacts(opts):
-    tmpFile = HOME_DIR + 'xgds.json'
-    factsFile = '/etc/facter/facts.d/xgds.json'
+    tmpFile = HOME_DIR + 'georef.json'
+    factsFile = '/etc/facter/facts.d/georef.json'
     factsDir = os.path.dirname(factsFile)
     if not os.path.exists(factsDir):
         dosys('sudo mkdir -p %s' % factsDir)
@@ -168,11 +168,11 @@ def setup(opts):
     logging.info('Deploying installation of type %s...', opts.type)
 
     os.chdir(HOME_DIR)
-    symlinkDeployRepo('xgds_' + SITE_NAME + '_deploy')
+    symlinkDeployRepo(SITE_NAME + '_deploy')
     installPuppet()
-    found = linkExistingSource('xgds_' + SITE_NAME)
+    found = linkExistingSource(SITE_NAME)
     if not found:
-        checkoutSourceRepo('xgds_' + SITE_NAME)
+        checkoutSourceRepo(SITE_NAME)
     setupPuppetFacts(opts)
     runPuppet(SITE_NAME)
 

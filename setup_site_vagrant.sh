@@ -6,10 +6,10 @@ egrep '\[user\]|email = |name = |\[push\]|default = simple' $HOME/.gitconfig > e
 
 vagrant up --no-provision
 
-# check out xgds_basalt to be shared in the /vagrant directory for DEVELOPMENT usage. 
+# check out georef to be shared in the /vagrant directory for DEVELOPMENT usage. 
 # If you pass in any arguemnt (ie production) this will get skipped
 if [ $# -eq 0 ]; then 
-	[ ! -f xgds_basalt ] && python -c 'import setup_site; setup_site.checkoutSourceRepo("xgds_basalt", False)'
+	[ ! -f georef ] && python -c 'import setup_site; setup_site.checkoutSourceRepo("georef", False)'
 fi
 
 # the first time we run the setup script, we need to do it from within a
