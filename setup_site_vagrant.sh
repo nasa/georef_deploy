@@ -16,5 +16,5 @@ fi
 # 'vagrant ssh' session, so there is an interactive pty that allows you
 # to type your password during 'git clone' operations. after that,
 # 'vagrant provision' can be used.
-vagrant ssh -c 'python /vagrant/georef/setup_site.py'
+vagrant ssh -c 'python /vagrant/setup_site.py'
 
