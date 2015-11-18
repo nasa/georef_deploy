@@ -62,6 +62,10 @@ class ubuntu_packages {
   package { 'couchdb':}
   package { 'libproj-dev': }
   package { 'gdal-bin': }
+  package { 'python-gdal': }
+  package { 'libjpeg-dev': }
+  package { 'zlib1g-dev': }
+  package { 'libpng12-dev': }
 
   # optional - for dev
   package { 'emacs': }
@@ -244,6 +248,17 @@ class pip_packages {
     provider => 'pip',
   }
   package { 'qrcode':
+    provider => 'pip',
+  }
+  package { 'PIL':
+    provider => 'pip',
+    install_options => ['--allow-external PIL --allow-unverified PIL']
+  }
+
+  package { 'django_digest':
+    provider => 'pip',
+  }
+  package { 'python_digest':
     provider => 'pip',
   }
 }
