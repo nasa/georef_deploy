@@ -250,10 +250,10 @@ class pip_packages {
   package { 'qrcode':
     provider => 'pip',
   }
-  package { 'PIL':
-    provider => 'pip',
-    install_options => ['--allow-external PIL --allow-unverified PIL']
-  }
+  #package { 'PIL':
+  #  provider => 'pip',
+  #  install_options => ['--allow-external PIL --allow-unverified PIL']
+  #}
 
   package { 'django_digest':
     provider => 'pip',
