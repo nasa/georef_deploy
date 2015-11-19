@@ -189,7 +189,8 @@ if __name__ == '__main__':
     GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
     HOME_DIR = '/home/geocam/'
     GDS_DIR = HOME_DIR + 'gds/'
-    USER = os.getenv('USER')
+    #USER = os.getenv('USER')
+    USER = 'geocam'
     PUPPET_DIR = HOME_DIR + 'puppet/'
     VAGRANT_DIR = '/vagrant'
 
