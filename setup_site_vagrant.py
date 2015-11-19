@@ -5,21 +5,6 @@ This script will configure an xGDS site installation using puppet.  You
 can specify whether you want a development or production setup.
 """
 
-import os
-import sys
-import logging
-import tempfile
-import json
-import subprocess
-
-SITE_NAME = 'georef'
-GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
-HOME_DIR = os.path.expanduser('~') + '/'
-GDS_DIR = HOME_DIR + 'gds/'
-USER = os.getenv('USER')
-PUPPET_DIR = HOME_DIR + 'puppet/'
-VAGRANT_DIR = '/vagrant'
-
 
 def dosys(cmd, exitOnError=True):
     logging.info('executing: %s', cmd)
@@ -80,7 +65,7 @@ def installPuppet():
         dosys('sudo sh -c "grep -v templatedir %s > %s"' % (puppetConfOrig, puppetConfPath))
 
 
-def symlinkDeployRepo(repo):
+def symlinkDeployRepo(repo, PUPPET_DIR):
     # if the /vagrant dir exists, we are in a vagrant guest, and
     # /vagrant should point to a checkout of <site>_deploy on the
     # host file system. to avoid confusion, let's symlink to that single
@@ -97,7 +82,7 @@ def symlinkDeployRepo(repo):
         dosys('ln -s %s %s' % (thisDir, repoDir))
 
 
-def linkExistingSource(repo):
+def linkExistingSource(repo, GDS_DIR, VAGRANT_DIR):
     """ If the user checked out the source code on the host machine, it will be in /vagrant.
     Link it to GDS_DIR
     """
@@ -110,7 +95,7 @@ def linkExistingSource(repo):
     return False
 
 
-def checkoutSourceRepo(repo, inVagrant=True):
+def checkoutSourceRepo(repo, GIT_URL_PREFIX, GDS_DIR, inVagrant=True):
     if inVagrant:
         dosys('sudo apt-get install -y git-core')
         repoDir = GDS_DIR + repo
@@ -126,7 +111,7 @@ def checkoutSourceRepo(repo, inVagrant=True):
         dosys('cd %s/%s && git submodule foreach git checkout master' % (GDS_DIR, repo))
 
 
-def setupPuppetFacts(opts):
+def setupPuppetFacts(opts, HOME_DIR, SITE_NAME, USER):
     tmpFile = HOME_DIR + 'georef.json'
     factsFile = '/etc/facter/facts.d/georef.json'
     factsDir = os.path.dirname(factsFile)
@@ -160,7 +145,7 @@ def runPuppet(site):
           % ctx)
 
 
-def setup(opts):
+def setup(opts, SITE_NAME, HOME_DIR, GDS_DIR, USER):
     if opts.type == 'auto':
         insideVagrantGuest = os.path.isdir('/vagrant')
         opts.type = 'development' if insideVagrantGuest else 'production'
@@ -168,16 +153,16 @@ def setup(opts):
     logging.info('Deploying installation of type %s...', opts.type)
 
     os.chdir(HOME_DIR)
-    symlinkDeployRepo(SITE_NAME + '_deploy')
+    symlinkDeployRepo(SITE_NAME + '_deploy', PUPPET_DIR)
     installPuppet()
-    found = linkExistingSource(SITE_NAME)
+    found = linkExistingSource(SITE_NAME, GDS_DIR, VAGRANT_DIR)
     if not found:
-        checkoutSourceRepo(SITE_NAME)
-    setupPuppetFacts(opts)
+        checkoutSourceRepo(SITE_NAME, GIT_URL_PREFIX, GDS_DIR)
+    setupPuppetFacts(opts, HOME_DIR, SITE_NAME, USER)
     runPuppet(SITE_NAME)
 
 
-def main():
+def main(SITE_NAME, GIT_URL_PREFIX, HOME_DIR, GDS_DIR, USER, PUPPET_DIR, VAGRANT_DIR):
     import optparse
     parser = optparse.OptionParser('usage: %prog OPTS\n' + __doc__)
     parser.add_option('--type',
@@ -189,8 +174,23 @@ def main():
         parser.error('expected no args')
 
     logging.basicConfig(level=logging.INFO, format='%(message)s')
-    setup(opts)
+    setup(opts, SITE_NAME, HOME_DIR, GDS_DIR, USER)
 
 
 if __name__ == '__main__':
-    main()
+    import os
+    import sys
+    import logging
+    import tempfile
+    import json
+    import subprocess
+
+    SITE_NAME = 'georef'
+    GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
+    HOME_DIR = os.path.expanduser('~') + '/'
+    GDS_DIR = HOME_DIR + 'gds/'
+    USER = os.getenv('USER')
+    PUPPET_DIR = HOME_DIR + 'puppet/'
+    VAGRANT_DIR = '/vagrant'
+
+    main(SITE_NAME, GIT_URL_PREFIX, HOME_DIR, GDS_DIR, USER, PUPPET_DIR, VAGRANT_DIR)
