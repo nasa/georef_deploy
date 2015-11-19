@@ -187,7 +187,7 @@ if __name__ == '__main__':
 
     SITE_NAME = 'georef'
     GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
-    HOME_DIR = os.path.expanduser('~') + '/'
+    HOME_DIR = '/home/geocam/'
     GDS_DIR = HOME_DIR + 'gds/'
     USER = os.getenv('USER')
     PUPPET_DIR = HOME_DIR + 'puppet/'
