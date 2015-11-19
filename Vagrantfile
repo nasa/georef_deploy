@@ -31,6 +31,6 @@ Vagrant.configure("2") do |config|
   # folder, and the third is the path on the host to the actual folder.
   #config.vm.synced_folder "georef/", "/home/vagrant", owner: "vagrant", group: "vagrant"
 
-  config.vm.provision "shell", privileged: false, path: "setup_site.py"
+  config.vm.provision "shell", privileged: false, path: "setup_site_vagrant.py"
   config.ssh.pty = true
 end
