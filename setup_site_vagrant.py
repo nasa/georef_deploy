@@ -96,6 +96,7 @@ def linkExistingSource(repo, GDS_DIR, VAGRANT_DIR):
 
 
 def checkoutSourceRepo(repo, GIT_URL_PREFIX, GDS_DIR, inVagrant=True):
+    import os
     if inVagrant:
         dosys('sudo apt-get install -y git-core')
         repoDir = GDS_DIR + repo
