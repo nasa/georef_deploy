@@ -9,7 +9,7 @@ vagrant up --no-provision
 # check out georef to be shared in the /vagrant directory for DEVELOPMENT usage. 
 # If you pass in any arguemnt (ie production) this will get skipped
 if [ $# -eq 0 ]; then 
-	[ ! -f georef ] && python -c 'import setup_site; import os; setup_site.checkoutSourceRepo("georef", "https://babelfish.arc.nasa.gov/git/", "gds/", False)'
+	[ ! -f georef ] && python -c 'import setup_site; setup_site.checkoutSourceRepo("georef", "https://babelfish.arc.nasa.gov/git/", "gds/", False)'
 fi
 
 # the first time we run the setup script, we need to do it from within a
