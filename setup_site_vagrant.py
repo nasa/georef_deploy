@@ -106,7 +106,6 @@ def checkoutSourceRepo(repo, GIT_URL_PREFIX, GDS_DIR, inVagrant=True):
         GDS_DIR = '.'
         repoDir = repo
         print "Set GDS_DIR to %s" % GDS_DIR 
-    import os
     if os.path.exists(repoDir):
         logging.info('%s exists, not changing existing config', repoDir)
     else:
