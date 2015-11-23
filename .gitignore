@@ -2,3 +2,5 @@
 .pydevproject
 /xgds_basalt
 *.pyc
+.vagrant
+etc/
