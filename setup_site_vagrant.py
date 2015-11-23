@@ -104,9 +104,12 @@ def checkoutSourceRepo(repo, GIT_URL_PREFIX, GDS_DIR, inVagrant=True):
     else:
         GDS_DIR = '.'
         repoDir = repo
+        print "Set GDS_DIR to %s" % GDS_DIR 
     if os.path.exists(repoDir):
         logging.info('%s exists, not changing existing config', repoDir)
     else:
+        print 'cd %s && git clone --recursive %s/%s' % (GDS_DIR, GIT_URL_PREFIX, repo)
+        print 'cd %s/%s && git submodule foreach git checkout master' % (GDS_DIR, repo)
         dosys('cd %s && git clone --recursive %s/%s' % (GDS_DIR, GIT_URL_PREFIX, repo))
         dosys('cd %s/%s && git submodule foreach git checkout master' % (GDS_DIR, repo))
 
