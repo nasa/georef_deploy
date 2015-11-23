@@ -7,6 +7,7 @@ can specify whether you want a development or production setup.
 
 
 def dosys(cmd, exitOnError=True):
+    import logging
     logging.info('executing: %s', cmd)
     ret = os.system(cmd)
     if ret != 0:
@@ -97,6 +98,7 @@ def linkExistingSource(repo, GDS_DIR, VAGRANT_DIR):
 
 def checkoutSourceRepo(repo, GIT_URL_PREFIX, GDS_DIR, inVagrant=True):
     import os
+    import logging
     if inVagrant:
         dosys('sudo apt-get install -y git-core')
         repoDir = GDS_DIR + repo
