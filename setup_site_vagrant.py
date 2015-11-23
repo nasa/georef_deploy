@@ -8,6 +8,8 @@ can specify whether you want a development or production setup.
 
 def dosys(cmd, exitOnError=True):
     import logging
+    import os
+    import sys
     logging.info('executing: %s', cmd)
     ret = os.system(cmd)
     if ret != 0:
