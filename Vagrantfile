@@ -8,7 +8,7 @@ Vagrant.configure("2") do |config|
   # config.vm.box_url = "http://cloud-images.ubuntu.com/vagrant/trusty/trusty-server-cloudimg-amd64-juju-vagrant-disk1.box"
 
   config.vm.provider "virtualbox" do |vb|
-    vb.memory = 2048
+    vb.memory = 4096
     vb.cpus = 2
 
     # run "VAGRANT_GUI=1 vagrant up" to get a display; default is headless mode
