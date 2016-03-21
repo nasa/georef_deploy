@@ -2,15 +2,26 @@
 include apt
 include stdlib
 
-# $user, $site, $dev_instance set in /etc/facter/facts.d/georef.json -- see setup_site.py
+# $user, $site, $dev_instance set in /etc/facter/facts.d/xgds.json -- see setup_site.py
 
-$deploy = "/home/$user/puppet/${site}_deploy"
+$deploy = "/home/$user/puppet/georef_deploy"
 if $dev_instance {
-  $sitedir = "/home/$user/gds/${site}"
+  $sitedir = "/home/$user/gds/georef"
 }
 else {
-  $sitedir = "/home/$user/${site}"
+  $sitedir = "/home/$user/georef"
 }
+
+class java_repo {
+    exec { 'add-java-repo':
+      command => "sudo apt-add-repository ppa:webupd8team/java",
+      path => "/usr/bin",
+      creates => "/etc/apt/sources.list.d/webupd8team-java-trusty.list"
+    }
+}
+
+class { 'java_repo': }
+Class['java_repo'] -> Class['ubuntu_packages']
 
 #################################################################
 # MARIA DB PACKAGE Source
@@ -63,9 +74,13 @@ class ubuntu_packages {
   package { 'libproj-dev': }
   package { 'gdal-bin': }
   package { 'python-gdal': }
-  package { 'libjpeg-dev': }
-  package { 'zlib1g-dev': }
-  package { 'libpng12-dev': }
+  package { 'memcached': }
+  package { 'libmemcached-dev': }
+  package { 'pkg-config': }
+  package { 'python-matplotlib': }
+
+#  You can't auto-install Java because the installer seems to insist on manual acceptance of the Oracle Java License
+#  package { 'oracle-java8-installer': }
 
   # optional - for dev
   package { 'emacs': }
@@ -89,30 +104,33 @@ class ubuntu_packages {
   # file in one of two places, depending on the flavor of Ubuntu we
   # are using (server ISO vs "cloud image" used by Vagrant). We'll
   # just write to both locations (sigh).
-  file { '/etc/default/grub':
-    ensure => file,
-    source => "${deploy}/etc/grub-defaults",
-  }
-  #file { '/etc/default/grub.d/50-cloudimg-settings.cfg':
-  #  ensure => file,
-  #  source => "${deploy}/etc/grub-defaults",
-  #}
+  if $database {
+    file { '/etc/default/grub':
+      ensure => file,
+      source => "${deploy}/etc/grub-defaults",
+    }
+    #file { '/etc/default/grub.d/50-cloudimg-settings.cfg':
+    #  ensure => file,
+    #  source => "${deploy}/etc/grub-defaults",
+    #}
 
-  exec { 'grub-setup':
-    command => '/usr/sbin/grub-mkconfig -o /boot/grub/grub.cfg',
-    require => [
-      File['/etc/default/grub'],
-      # File['/etc/default/grub.d/50-cloudimg-settings.cfg'],
-    ],
+    exec { 'grub-setup':
+      command => '/usr/sbin/grub-mkconfig -o /boot/grub/grub.cfg',
+      require => [
+        File['/etc/default/grub'],
+        # File['/etc/default/grub.d/50-cloudimg-settings.cfg'],
+      ],
+    }
   }
-
   # The config file stuff above makes a persistent change to the
   # transparent_hugepages setting. This command redundantly does a
   # one-time fix so we don't have to reboot partway through
   # provisioning to pick up the config file change.
-  exec { 'immediate_transparent_hugepages':
-    command => "/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled && /usr/bin/touch /home/$user/.hugepage_fixed && sudo /usr/sbin/service mysql restart",
-    creates => "/home/$user/.hugepage_fixed"
+  if $database {
+     exec { 'immediate_transparent_hugepages':
+             command => "/bin/echo never > /sys/kernel/mm/transparent_hugepage/enabled && /usr/bin/touch /home/$user/.hugepage_fixed && sudo /usr/sbin/service mysql restart",
+             creates => "/home/$user/.hugepage_fixed"
+     }
   }
 }
 
@@ -123,11 +141,12 @@ class { 'ubuntu_packages': }
 
 class pip_packages {
   package { 'django':
-    ensure => '1.7.3',
+    ensure => '1.9.2',
     provider => 'pip',
   }
   package { 'django-pipeline':
     provider => 'pip',
+    ensure => '1.5.4',  # for compatibility with older django; remove this after we upgrade to 1.9
   }
   package { 'django-compressor':
     provider => 'pip',
@@ -137,8 +156,15 @@ class pip_packages {
   }
   package { 'django-reversion':
     provider => 'pip',
+    source => 'git+https://github.com/etianen/django-reversion.git@release-1.10.0'
   }
   package { 'django-sphinx':
+    provider => 'pip',
+  }
+  package { 'httplib2':
+    provider => 'pip',
+  }
+  package { 'jinja2':
     provider => 'pip',
   }
   package { 'pyproj':
@@ -150,9 +176,14 @@ class pip_packages {
   package { 'pytz':
     provider => 'pip',
   }
-  package { 'django-taggit':
+  package { 'python-dateutil':
     provider => 'pip',
-    source => 'git+git://github.com/tamarmot/django-taggit.git#egg=django-taggit',
+  }
+  package { 'django-treebeard':
+    provider => 'pip',
+  }
+  package { 'django-taggit':
+    provider => 'pip'
   }
   package { 'django-filter':
     provider => 'pip',
@@ -162,6 +193,9 @@ class pip_packages {
     provider => 'pip',
   }
   package { 'pyzmq':
+    provider => 'pip',
+  }
+  package { 'pylibmc':
     provider => 'pip',
   }
   # this rule fixes a problem in the pyzmq permissions after install
@@ -231,6 +265,10 @@ class pip_packages {
      require => Package['python-pip'],
   }
 
+  package { 'django-resumable':
+    provider => 'pip',
+  }
+
   # optional - for kml validation during testing
   package { 'pykml':
     provider => 'pip',
@@ -242,6 +280,7 @@ class pip_packages {
     provider => 'pip',
   }
 
+
   # put extra packages to install here.
 
   package { 'fpdf':
@@ -250,16 +289,9 @@ class pip_packages {
   package { 'qrcode':
     provider => 'pip',
   }
-  #package { 'PIL':
-  #  provider => 'pip',
-  #  install_options => ['--allow-external PIL --allow-unverified PIL']
-  #}
-
-  package { 'django_digest':
+  package { 'spc':
     provider => 'pip',
-  }
-  package { 'python_digest':
-    provider => 'pip',
+    source => 'git+git://github.com/rohanisaac/spc.git',
   }
 }
 
@@ -309,17 +341,25 @@ Class['ubuntu_packages'] -> Class['npm_packages']
 # https://forge.puppetlabs.com/puppetlabs/mysql
 
 class mysql_setup {
-  # install mysqld server
-  class { 'mysql::server':
-    package_name => 'mariadb-server-10.0',
-    root_password => 'vagrant',
-    override_options => {
-      'mysqld' => {
-        'plugin-load' => 'ha_tokudb',
+  if $database {
+    # install mysqld server
+    class { 'mysql::server':
+      package_name => 'mariadb-server-10.0',
+      root_password => 'vagrant',
+      override_options => {
+        'mysqld' => {
+          'plugin-load' => 'ha_tokudb',
+        }
       }
     }
+    contain 'mysql::server'
+  } else {
+    # install mysqld server
+    class { 'mysql::client':
+      package_name => 'mariadb-client-10.0'
+    }
+    contain 'mysql::client'
   }
-  contain 'mysql::server'
 
   # install python bindings
   class { 'mysql::bindings':
@@ -363,24 +403,29 @@ Class['ubuntu_packages'] -> Class['apache_setup']
 # SITE SETUP
 
 if $dev_instance {
-  $apacheConfSource = "${deploy}/etc/${site}_dev.conf"
+  $apacheConfSource = "${deploy}/etc/georef_dev.conf"
 }
 else {
-  $apacheConfSource = "${deploy}/etc/${site}_prod.conf"
+  if $use_ssl {
+    $apacheConfSource = "${deploy}/etc/georef_prod.conf"
+  }
+  else {
+    $apacheConfSource = "${deploy}/etc/georef_prod_nossl.conf"
+  }
 }
 
 class site_setup {
   # make symlinks to the apache site config in the standard locations so
   # apache uses it.
   file { 'apache2_conf_available':
-    path => "/etc/apache2/sites-available/${site}.conf",
+    path => "/etc/apache2/sites-available/georef.conf",
     ensure => file,
     content => file($apacheConfSource),
   }
   file { 'apache2_conf_enabled':
-    path => "/etc/apache2/sites-enabled/${site}.conf",
+    path => "/etc/apache2/sites-enabled/georef.conf",
     ensure => link,
-    target => "../sites-available/${site}.conf",
+    target => "../sites-available/georef.conf",
     require => File['apache2_conf_available'],
   }
   # pyraptord boot script
@@ -405,7 +450,7 @@ class site_setup {
   }
 
   class dbcreate {
-    mysql::db { "${site}":
+    mysql::db { "georef":
       ensure => present,
       user => $user,
       password => 'vagrant',
@@ -413,30 +458,32 @@ class site_setup {
       collate => 'utf8_general_ci',
     }
   }
-  class { 'dbcreate': }
-  contain 'dbcreate'
+  if $database {
+    class { 'dbcreate': }
+    contain 'dbcreate'
+  }
 
 #  exec { 'dbfetch':
-#    command => "/usr/bin/curl -o /home/$user/puppet/xgds_${site}_dump.sql.gz http://xgds.org/vagrant/xgds_${site}_dump.sql.gz",
-#    creates => "/home/$user/puppet/xgds_${site}_dump.sql.gz",
+#    command => "/usr/bin/curl -o /home/$user/puppet/georef_dump.sql.gz http://xgds.org/vagrant/georef_dump.sql.gz",
+#    creates => "/home/$user/puppet/georef_dump.sql.gz",
 #    user => $user,
 #  }
 
 #  exec { 'dbrestore':
-#    command => "/bin/gunzip -c /home/$user/puppet/xgds_${site}_dump.sql.gz | ${sitedir}/manage.py dbshell",
-#    creates => "/var/lib/mysql/xgds_${site}/auth_user.frm",
+#    command => "/bin/gunzip -c /home/$user/puppet/georef_dump.sql.gz | ${sitedir}/manage.py dbshell",
+#    creates => "/var/lib/mysql/georef/auth_user.frm",
 #    require => [Class['dbcreate'], Exec['extraSettings'], Exec['dbfetch']],
 #    user => $user,
 #  }
 
 #  exec { 'datafetch':
-#    command => "/usr/bin/curl -o /home/$user/puppet/xgds_${site}_data_dir.tgz http://xgds.org/vagrant/xgds_${site}_data_dir.tgz",
-#    creates => "/home/$user/puppet/xgds_${site}_data_dir.tgz",
+#    command => "/usr/bin/curl -o /home/$user/puppet/georef_data_dir.tgz http://xgds.org/vagrant/georef_data_dir.tgz",
+#    creates => "/home/$user/puppet/georef_data_dir.tgz",
 #    user => $user,
 #  }
 
 #  exec { 'data_dir_unpack':
-#    command => "/bin/tar xfz /home/$user/puppet/xgds_${site}_data_dir.tgz && chmod -R a+rX xgds_${site}_data && chmod -R g+w xgds_${site}_data && find xgds_${site}_data -type d | xargs chmod g+s && sudo chown -R www-data:www-data xgds_${site}_data && mv xgds_${site}_data xgds_${site}/data",
+#    command => "/bin/tar xfz /home/$user/puppet/georef_data_dir.tgz && chmod -R a+rX georef_data && chmod -R g+w georef_data && find georef_data -type d | xargs chmod g+s && sudo chown -R www-data:www-data georef_data && mv georef_data georef/data",
 #    cwd => "/home/$user/gds/",
 #    creates => "${sitedir}/data",
 #    require => Exec['datafetch'],
@@ -449,19 +496,25 @@ class site_setup {
     groups => ['www-data'],
   }
 
+  if $dev_instance {
+    $prepDirectory = "gds/georef"
+  } else {
+    $prepDirectory = "georef"
+  }
+
   exec { 'prep':
     # can't run this with root environment variables, because bower
     # crashes if it looks for files in root's home directory. setting the puppet
     # 'user' flag as shown below isn't sufficient. 'su' seems to be needed.
-    command => "/bin/su -l $user -c '(cd gds/georef && ./manage.py prep)'",
+    command => "/bin/su -l $user -c '(cd $prepDirectory && ./manage.py prep)'",
     require => Exec['bootstrap'],
   }
 
   # symlink shortcut for dev environment only
   if $dev_instance {
-    file { "/home/$user/${site}":
+    file { "/home/$user/georef":
       ensure => link,
-      target => "gds/${site}",
+      target => "gds/georef",
     }
   }
 
