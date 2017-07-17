@@ -119,7 +119,13 @@ Create the file in your data directory::
     # from outside vagrant shell
     mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
 
+
+Install django-deepzoom plug-in, which tiles the image for the Openseadragon image viewer::
+    sudo pip install -U django-deepzoom
+
 To initialize the database::
+    $GEOCAM_DIR/georef/manage.py makemigrations django-deepzoom
+
     $GEOCAM_DIR/georef/manage.py makemigrations geocamTiePoint
 
     $GEOCAM_DIR/georef/manage.py makemigrations georefApp
