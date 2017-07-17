@@ -221,9 +221,9 @@ class pip_packages {
     provider => 'pip',
     require => [Exec['pyzmq-readable'], Package['gevent']],
   }
-  package { 'ipython':
-    provider => 'pip',
-  }
+  #package { 'ipython':
+  #  provider => 'pip',
+  #}
   package { 'tornado':
     provider => 'pip',
   }
@@ -266,11 +266,11 @@ class pip_packages {
   #  source => 'http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz',
   #  provider => 'pip',
   #}
-  exec { 'closure-linter':
-     command => "/usr/bin/pip install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz && touch /home/$user/.installed-closure-linter",
-     creates => "/home/$user/.installed-closure-linter",
-     require => Package['python-pip'],
-  }
+  #exec { 'closure-linter':
+  #   command => "/usr/bin/pip install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz && touch /home/$user/.installed-closure-linter",
+  #   creates => "/home/$user/.installed-closure-linter",
+  #   require => Package['python-pip'],
+  #}
 
   package { 'django-resumable':
     provider => 'pip',
