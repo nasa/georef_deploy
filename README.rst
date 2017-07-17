@@ -90,6 +90,24 @@ First install Ubuntu packages::
   # must install PIL through Ubuntu package system, PyPI version fails on Ubuntu
   sudo apt-get install python-imaging
 
+Override settings.py
+~~~~~~~~~~~~~~~~~~~~~~~
+
+In the ``settings.py`` file, modify the ``DATABASES`` field to point to
+your Django MySQL database::
+
+```
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'georef',
+        'USER': 'root',
+        'PASSWORD': 'vagrant',
+        'HOST': '127.0.0.1',
+        'PORT': '3306',
+    }
+}
+```
 
 Set Up GeoRef
 ~~~~~~~~~~~~~~~~
@@ -136,26 +154,12 @@ Note that the path to manage.py may be different if you are running inside Vagra
 
 Try It Out
 ~~~~~~~~~~
+Now you're ready to try it out!  
 
-Now you're ready to try it out!  Point your browser to ​http://10.0.3.18/
+Restart the Apache server ``sudo apachectl restart``
 
+Point your browser to ​http://10.0.3.18/
 
-Override settings.py
-~~~~~~~~~~~~~~~~~~~~~~~
-
-In the ``settings.py`` file, modify the ``DATABASES`` field to point to
-your Django MySQL database::
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'georef',
-        'USER': 'root',
-        'PASSWORD': 'vagrant',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
-    }
-}
 
 .. o  __BEGIN_LICENSE__
 .. o  Copyright (C) 2008-2010 United States Government as represented by
