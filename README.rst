@@ -96,20 +96,16 @@ Override settings.py
 In the ``settings.py`` file, modify the ``DATABASES`` field to point to
 your Django MySQL database::
 
-```
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'georef',
-        'USER': 'root',
-        'PASSWORD': 'vagrant',
-        'HOST': '127.0.0.1',
-        'PORT': '3306',
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.mysql',
+            'NAME': 'georef',
+            'USER': 'root',
+            'PASSWORD': 'vagrant',
+            'HOST': '127.0.0.1',
+            'PORT': '3306',
+        }
     }
-}
-
-```
 
 Set Up GeoRef
 ~~~~~~~~~~~~~~~~
