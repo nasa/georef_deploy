@@ -132,11 +132,13 @@ you were in a virtualenv when you ran ``setup.py``).
 If you see the following error: ValueError: Unable to configure handler 'file' ``[Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'.``
 
 Create the file in your data directory::
+
     # from outside vagrant shell
     mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
 
 
 Install django-deepzoom plug-in, which tiles the image for the Openseadragon image viewer::
+    
     sudo pip install -U django-deepzoom
 
 To initialize the database
