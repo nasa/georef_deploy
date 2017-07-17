@@ -280,9 +280,7 @@ class pip_packages {
     provider => 'pip',
   }
 
-
   # put extra packages to install here.
-
   package { 'fpdf':
     provider => 'pip',
   }
@@ -293,6 +291,14 @@ class pip_packages {
     provider => 'pip',
     source => 'git+git://github.com/rohanisaac/spc.git',
   }
+  package { 'django-deepzoom':
+    provider => 'pip',
+  }
+  package { 'piexif':
+    provider => 'pip',
+  }
+ 
+ 
 }
 
 class { 'pip_packages': }
