@@ -88,18 +88,23 @@ First install Ubuntu packages::
   sudo apt-get install libpng-dev libjpeg-dev libfreetype6-dev libtiff-dev imagemagick
 
   # must install PIL through Ubuntu package system, PyPI version fails on Ubuntu
-  sudo apt-get python-imaging
+  sudo apt-get install python-imaging
 
 
 Set Up GeoRef
 ~~~~~~~~~~~~~~~~
 
+If your development environment is set up inside Vagrant, cd into the georef_deploy 
+directory and do::
+    vagrant ssh
+And then run the following commands.
+
 To install Python dependencies, render icons and collect media for the
 server, run::
 
-  cd $GEOCAM_DIR/georef
+  cd $GEOCAM_DIR/georef_deploy/georef
   ./manage.py bootstrap --yes
-  source $GEOCAM_DIR/georef/sourceme.sh genSourceme genSettings
+  source $GEOCAM_DIR/georef_deploy/georef/sourceme.sh genSourceme genSettings
   ./manage.py prep
 
 You'll need to source the ``sourceme.sh`` file every time you open a new
