@@ -97,6 +97,7 @@ In the ``settings.py`` file, modify the ``DATABASES`` field to point to
 your Django MySQL database::
 
 ```
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
@@ -107,6 +108,7 @@ DATABASES = {
         'PORT': '3306',
     }
 }
+
 ```
 
 Set Up GeoRef
