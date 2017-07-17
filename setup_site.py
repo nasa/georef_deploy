@@ -13,7 +13,6 @@ import json
 import subprocess
 
 SITE_NAME = 'georef'
-#GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
 GIT_URL_PREFIX = 'https://github.com/nasa/'
 HOME_DIR = os.path.expanduser('~') + '/'
 GDS_DIR = HOME_DIR + 'gds/'
