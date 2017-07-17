@@ -58,7 +58,7 @@ class ubuntu_packages {
   package { 'build-essential': }
   package { 'nfs-common': }
   package { 'python2.7': }
-  package { 'python-dev': }
+  package { 'python2.7-dev': }
   package { 'python-imaging': }
   package { 'python-scipy': }
   package { 'git': }
@@ -78,6 +78,13 @@ class ubuntu_packages {
   package { 'libmemcached-dev': }
   package { 'pkg-config': }
   package { 'python-matplotlib': }
+  package { 'sqlite3': }
+  package { 'libsqlite3-dev': }
+  package { 'libpng-dev': }
+  package { 'libjpeg-dev': }
+  package { 'libfreetype6-dev': }
+  package { 'libtiff-dev': }
+  package { 'imagemagick': }
 
 #  You can't auto-install Java because the installer seems to insist on manual acceptance of the Oracle Java License
 #  package { 'oracle-java8-installer': }
