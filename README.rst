@@ -49,19 +49,18 @@ You can install Git on Ubuntu with::
 
 Run the Setup Script
 ~~~~~~~~~~~~~~~~~~~~~
-	# go into the georef_deploy directory 
-	cd georef_deploy
+# go into the georef_deploy directory::
+    cd georef_deploy
 	
-	# if you are running inside a Vagrant VM do
-	setup_site_vagrant.sh
-	
-	OR 
-	
-	# if you are running directly on a Ubuntu Linux Machine, do
-	sudo python $GEOCAM_DIR/georef_deploy/setup_site.py
-		# You need to manually create couple symlinks if not running on vagrant.
-		sudo ln -s /home/geocam/georef_deploy georef_deploy
-		sudo ln -s gds/georef/ georef
+# if you are running inside a Vagrant VM do::
+    setup_site_vagrant.sh
+OR 
+# if you are running directly on a Ubuntu Linux Machine, do::
+    sudo python $GEOCAM_DIR/georef_deploy/setup_site.py
+    
+ # You need to manually create couple symlinks if not running on vagrant::
+    sudo ln -s /home/geocam/georef_deploy georef_deploy
+    sudo ln -s gds/georef/ georef
 
 The script should initialize the vagrant box and it clones all the submodules that are needed.
 
