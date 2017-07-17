@@ -117,7 +117,7 @@ you were in a virtualenv when you ran ``setup.py``).
 If you see the following error::
     ValueError: Unable to configure handler 'file': [Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'
 Create the file in your data directory::
-    mkdir -p &$GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
+    mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
 
     
 
