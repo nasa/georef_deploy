@@ -113,7 +113,7 @@ the Django development web server.  The ``sourceme.sh`` file will also
 take care of activating your virtualenv environment in new shells (if
 you were in a virtualenv when you ran ``setup.py``).
 
-If you see the following error: ValueError: Unable to configure handler 'file': [Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'
+If you see the following error: ValueError: Unable to configure handler 'file': [Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'.
 
 Create the file in your data directory::
     # from outside vagrant shell
