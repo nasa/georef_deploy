@@ -6,7 +6,7 @@ Requirements
 
 Our reference platform for GeoRef is Ubuntu Linux 14.04 LTS,
 running Python 2.7.6 and Django 1.9.2.  For development we use Django's
-built-in development web server with a SQLite 3.6 database.  
+built-in development web server MySQL database.  
 
 We develop using a VagrantBox VM running a Ubuntu Linux inside a Mac OS X host machine.
 Vagrant VM is strictly optional and only necessary if you are not running directly from a Ubuntu Linux Machine.
