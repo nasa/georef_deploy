@@ -98,9 +98,7 @@ directory and do::
     vagrant ssh
 And then run the following commands.
 
-If you see the following error: ValueError: Unable to configure handler 'file' ``[Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'.``
-
-Create the file in your data directory::
+You must create the following file and directory::
 
     # from outside vagrant shell
     mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
@@ -130,11 +128,18 @@ To initialize the database
 
     ``$GEOCAM_DIR/georef/manage.py makemigrations geocamTiePoint``
 
-    ``$GEOCAM_DIR/georef/manage.py makemigrations georefApp``
-    
     ``$GEOCAM_DIR/georef/manage.py migrate``
 
 Note that the path to manage.py may be different if you are running inside Vagrant.
+
+Create a User Account  
+~~~~~~~~~~~~~~~~~~~~~
+User name and password are required to use GeoRef. To create one, do::
+    
+    ./manage.py createsuperuser
+
+And follow the prompts.
+
 
 Try It Out
 ~~~~~~~~~~
