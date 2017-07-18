@@ -73,24 +73,6 @@ script and run the following::
     sudo ln -s gds/georef/ georef
 
 
-
-Install Non-Python Packages
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-First install Ubuntu packages::
-
-  # tools for Python package compilation and management
-  sudo apt-get install python2.7-dev python-pip
-
-  # database support for development in native django environment
-  sudo apt-get install sqlite3 libsqlite3-dev
-
-  # handling images
-  sudo apt-get install libpng-dev libjpeg-dev libfreetype6-dev libtiff-dev imagemagick
-
-  # must install PIL through Ubuntu package system, PyPI version fails on Ubuntu
-  sudo apt-get install python-imaging
-
 Override settings.py
 ~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -143,12 +125,8 @@ take care of activating your virtualenv environment in new shells (if
 you were in a virtualenv when you ran ``setup.py``).
 
 
-Install django-deepzoom plug-in, which tiles the image for the Openseadragon image viewer::
-    
-    sudo pip install -U django-deepzoom
-
 To initialize the database
-    ``$GEOCAM_DIR/georef/manage.py makemigrations django-deepzoom``
+    ``$GEOCAM_DIR/georef/manage.py makemigrations deepzoom``
 
     ``$GEOCAM_DIR/georef/manage.py makemigrations geocamTiePoint``
 
