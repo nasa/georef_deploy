@@ -19,7 +19,8 @@ If you are running on a mac, we highly encourage you to use Vagrant to set up
 a Ubuntu Development Instance. Our set up script works best within the Vagrant 
 environment running on Mac OSX.
 
-Install VirtualBox. Make sure the version is 4.3.10.
+Install VirtualBox. We have found that VirtualBox Version 4.3.10 works best with Vagrant.
+We highly recommend you download VirtualBox 4.3.10.
 Install the latest version of vagrant: ​http://www.vagrantup.com/downloads
 
 
@@ -115,6 +116,18 @@ directory and do::
     vagrant ssh
 And then run the following commands.
 
+If you see the following error: ValueError: Unable to configure handler 'file' ``[Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'.``
+
+Create the file in your data directory::
+
+    # from outside vagrant shell
+    mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
+
+
+Install Earth Engine by following the instructions below: 
+    https://developers.google.com/earth-engine/python_install_manual
+
+
 To install Python dependencies, render icons and collect media for the
 server, run::
 
@@ -128,13 +141,6 @@ shell if you want to run GeoCam-related Python scripts such as starting
 the Django development web server.  The ``sourceme.sh`` file will also
 take care of activating your virtualenv environment in new shells (if
 you were in a virtualenv when you ran ``setup.py``).
-
-If you see the following error: ValueError: Unable to configure handler 'file' ``[Errno 2] No such file or directory: '/vagrant/georef/data/deepzoom/deepzoom.exception.log'.``
-
-Create the file in your data directory::
-
-    # from outside vagrant shell
-    mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
 
 
 Install django-deepzoom plug-in, which tiles the image for the Openseadragon image viewer::
