@@ -85,6 +85,8 @@ class ubuntu_packages {
   package { 'libfreetype6-dev': }
   package { 'libtiff-dev': }
   package { 'imagemagick': }
+  package { 'openssl': }
+
 
 #  You can't auto-install Java because the installer seems to insist on manual acceptance of the Oracle Java License
 #  package { 'oracle-java8-installer': }
@@ -221,9 +223,6 @@ class pip_packages {
     provider => 'pip',
     require => [Exec['pyzmq-readable'], Package['gevent']],
   }
-  #package { 'ipython':
-  #  provider => 'pip',
-  #}
   package { 'tornado':
     provider => 'pip',
   }
@@ -261,17 +260,7 @@ class pip_packages {
   package { 'm3u8':
     provider => 'pip',
   }
-  # this doesn't work as expected; replaced with exec resource below
-  #package { 'closure-linter':
-  #  source => 'http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz',
-  #  provider => 'pip',
-  #}
-  #exec { 'closure-linter':
-  #   command => "/usr/bin/pip install http://closure-linter.googlecode.com/files/closure_linter-latest.tar.gz && touch /home/$user/.installed-closure-linter",
-  #   creates => "/home/$user/.installed-closure-linter",
-  #   require => Package['python-pip'],
-  #}
-
+  
   package { 'django-resumable':
     provider => 'pip',
   }
@@ -304,8 +293,23 @@ class pip_packages {
   package { 'piexif':
     provider => 'pip',
   }
- 
- 
+  package { 'google-api-python-client':
+    provider => 'pip',
+  }
+  package { 'pyCrypto':
+    provider => 'pip',
+  }
+  package { 'pyOpenSSL>=0.11':
+    provider => 'pip',
+  }
+  package { 'earthengine-api':
+    provider => 'pip',
+  }
+
+
+
+
+
 }
 
 class { 'pip_packages': }
