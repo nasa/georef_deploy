@@ -97,11 +97,11 @@ You must manually create the data directory and its sub folders. GeoRef will
 write the image tiles to this directory.
 
 1. Create a data directory
-    mkdir $GEOCAM_DIR/georef/data
+    ``mkdir $GEOCAM_DIR/georef/data``
 2. Create the overlays directory
-    mkdir -p $GEOCAM_DIR/georef/data/geocamTiePoint/overlay_images
-4. Set the permissions
-    chmod -R 777 $GEOCAM_DIR/georef/data
+    ``mkdir -p $GEOCAM_DIR/georef/data/geocamTiePoint/overlay_images``
+3. Set the permissions
+    ``chmod -R 777 $GEOCAM_DIR/georef/data``
 
 
 Setup GeoRef
@@ -113,12 +113,12 @@ directory and do::
 And then run the following commands.
 
 
-You must create the following file and directory::
+You must create the following directory and files::
 
- If you are not using Vagrant, do::
+ # If you are not using Vagrant, do
      mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
 
- If you are using Vagrant, do::
+ # If you are using Vagrant, do
      # deepzoom directory needs to be owned by www-data. Put it in /home/vagrant so that it can be owned by www-data (and not by user)
      mkdir -p /home/vagrant/deepzoom 
      # create a symlink to deepzoom in the data dir
