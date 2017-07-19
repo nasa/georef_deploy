@@ -90,18 +90,39 @@ your Django MySQL database::
         }
     }
 
-Set Up GeoRef
-~~~~~~~~~~~~~~~~
+
+Setup the Data Directory
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+You must manually create the data directory and its sub folders. GeoRef will 
+write the image tiles to this directory.
+
+1. Create a data directory
+    mkdir $GEOCAM_DIR/georef/data
+2. Create the overlays directory
+    mkdir -p $GEOCAM_DIR/georef/data/geocamTiePoint/overlay_images
+4. Set the permissions
+    chmod -R 777 $GEOCAM_DIR/georef/data
+
+
+Setup GeoRef
+~~~~~~~~~~~~
 
 If your development environment is set up inside Vagrant, cd into the georef_deploy 
 directory and do::
     vagrant ssh
 And then run the following commands.
 
+
 You must create the following file and directory::
 
-    # from outside vagrant shell
-    mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
+ If you are not using Vagrant, do::
+     mkdir -p $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/ & touch $GEOCAM_DIR/georef_deploy/georef/data/deepzoom/deepzoom.exception.log
+
+ If you are using Vagrant, do::
+     # deepzoom directory needs to be owned by www-data. Put it in /home/vagrant so that it can be owned by www-data (and not by user)
+     mkdir -p /home/vagrant/deepzoom 
+     # create a symlink to deepzoom in the data dir
+     ln -s /home/vagrant/deepzoom /home/vagrant/georef/data/deepzoom
 
 
 Install Earth Engine by following the instructions below: 
@@ -114,6 +135,7 @@ server, run::
   cd $GEOCAM_DIR/georef_deploy/georef
   ./manage.py bootstrap --yes
   source $GEOCAM_DIR/georef_deploy/georef/sourceme.sh genSourceme genSettings
+  ./manage.py collectstatic  
   ./manage.py prep
 
 You'll need to source the ``sourceme.sh`` file every time you open a new
@@ -132,6 +154,7 @@ To initialize the database
 
 Note that the path to manage.py may be different if you are running inside Vagrant.
 
+
 Create a User Account  
 ~~~~~~~~~~~~~~~~~~~~~
 User name and password are required to use GeoRef. To create one, do::
@@ -139,6 +162,7 @@ User name and password are required to use GeoRef. To create one, do::
     ./manage.py createsuperuser
 
 And follow the prompts.
+
 
 
 Try It Out
