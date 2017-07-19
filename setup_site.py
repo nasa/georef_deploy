@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 
 """
-This script will configure an xGDS site installation using puppet.  You
+This script will configure an GeoRef site installation using puppet.  You
 can specify whether you want a development or production setup.
 """
 
@@ -13,7 +13,7 @@ import json
 import subprocess
 
 SITE_NAME = 'georef'
-GIT_URL_PREFIX = 'https://babelfish.arc.nasa.gov/git/'
+GIT_URL_PREFIX = 'https://github.com/nasa/'
 HOME_DIR = os.path.expanduser('~') + '/'
 GDS_DIR = HOME_DIR + 'gds/'
 USER = os.getenv('USER')
