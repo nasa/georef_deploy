@@ -4,4 +4,4 @@
 *.pyc
 .vagrant
 etc/
-certs
+certs/
